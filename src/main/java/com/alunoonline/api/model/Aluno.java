@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import org.antlr.v4.runtime.misc.NotNull;
 
 
 //@Entity é a entendidade Aluno, interage com o banco de dados, ou seja
@@ -24,6 +24,7 @@ public class Aluno {
     // Identity é a identidade de um e um
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     private Long id;
     private String nome;
     private String email;

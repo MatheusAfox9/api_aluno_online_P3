@@ -1,8 +1,12 @@
 package com.alunoonline.api.services;
 
 
+import com.alunoonline.api.exception.IdNaoEncontradoException;
+import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
 import com.alunoonline.api.model.Aluno;
+import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +27,12 @@ public class AlunoService {
     AlunoRepository repository;
 
     public Aluno create(Aluno aluno) {
+
+        boolean alunoExists = repository.existsByNomeAndEmailAndCurso(aluno.getNome(), aluno.getEmail(), aluno.getCurso());
+        if (alunoExists) {
+            throw new InformacaoAlunoDuplicadaException(aluno.getNome(), aluno.getEmail(), aluno.getCurso());
+        }
+
         return repository.save(aluno);
 
 
@@ -34,14 +44,32 @@ public class AlunoService {
 
     }
 
-    public Optional<Aluno> findById(Long Id) {
+    public Aluno findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id,"Aluno"));
+    }
 
-        return repository.findById(Id);
 
+    public Aluno update(Long id, Aluno aluno) {
+        Aluno alunoToUpdate = repository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id, "Aluno"));
+
+
+        alunoToUpdate.setNome(aluno.getNome());
+        alunoToUpdate.setEmail(aluno.getEmail());
+        alunoToUpdate.setCurso(aluno.getCurso());
+
+        Aluno alunoAtualizado = repository.save(alunoToUpdate);
+
+        return alunoAtualizado;
     }
 
 
     public void delete(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new IdNaoEncontradoException(id, "Aluno");
+        }
         repository.deleteById(id);
 
     }

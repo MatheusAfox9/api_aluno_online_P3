@@ -1,6 +1,6 @@
 package com.alunoonline.api.controller;
 
-import com.alunoonline.api.model.Aluno;
+import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.services.AlunoService;
 import com.alunoonline.api.services.ProfessorService;
@@ -37,8 +37,18 @@ public class ProfessorController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Professor> findById(@PathVariable Long id){
+    public Professor findById(@PathVariable Long id){
         return service.findById(id);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Professor> update(@PathVariable Long id, @RequestBody Professor professor) {
+
+        Professor professorAtualizado = service.update(id, professor);
+
+
+        return ResponseEntity.status(200).body(professorAtualizado);
     }
 
     @DeleteMapping("/{id}")

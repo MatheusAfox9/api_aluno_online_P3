@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/disciplina")
 public class DisciplinaController {
@@ -24,6 +27,36 @@ public class DisciplinaController {
 
         return ResponseEntity.status(201).body(disciplinaCreated);
 
+    }
+
+    @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Disciplina> findAll(){
+        return service.findAll();
+
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Disciplina findById(@PathVariable Long id){
+        return service.findById(id);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Disciplina> update(@PathVariable Long id, @RequestBody Disciplina disciplina) {
+
+        Disciplina disciplinaAtualizado = service.update(id, disciplina);
+
+
+        return ResponseEntity.status(200).body(disciplinaAtualizado);
+    }
+
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id){
+        service.delete(id);
     }
 
 

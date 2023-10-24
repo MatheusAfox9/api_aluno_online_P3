@@ -39,8 +39,18 @@ public class AlunoController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Aluno> findById(@PathVariable Long id){
+    public Aluno findById(@PathVariable Long id){
         return service.findById(id);
+    }
+
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Aluno> update(@PathVariable Long id, @RequestBody Aluno aluno) {
+
+        Aluno alunoAtualizado = service.update(id, aluno);
+
+        return ResponseEntity.status(200).body(alunoAtualizado);
     }
 
 

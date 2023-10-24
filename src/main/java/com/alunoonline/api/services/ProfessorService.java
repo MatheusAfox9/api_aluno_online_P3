@@ -1,5 +1,8 @@
 package com.alunoonline.api.services;
 
+import com.alunoonline.api.exception.IdNaoEncontradoException;
+import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
+import com.alunoonline.api.exception.InformacaoProfessorDuplicadaException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
@@ -16,10 +19,17 @@ public class ProfessorService {
     @Autowired
     ProfessorRepository repository;
 
-    public Professor create(Professor professor) {
-        return repository.save(professor);
 
+    public Professor create(Professor professor) {
+
+        boolean professorExists = repository.existsByNomeAndEmail(professor.getNome(), professor.getEmail());
+        if (professorExists) {
+            throw new InformacaoProfessorDuplicadaException(professor.getNome(), professor.getEmail());
+        }
+
+        return repository.save(professor);
     }
+
 
     public List<Professor> findAll() {
         repository.findAll();
@@ -27,13 +37,36 @@ public class ProfessorService {
 
     }
 
-    public Optional<Professor> findById(Long Id) {
+    public Professor findById(Long id) {
 
-        return repository.findById(Id);
+        return repository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
 
     }
 
+
+    public Professor update(Long id, Professor professor) {
+        Professor professorToUpdate = repository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
+
+
+        professorToUpdate.setNome(professor.getNome());
+        professorToUpdate.setEmail(professor.getEmail());
+
+
+        Professor professorAtualizado = repository.save(professorToUpdate);
+
+        return professorAtualizado;
+    }
+
+
+
     public void delete(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new IdNaoEncontradoException(id,"Professor");
+        }
+
         repository.deleteById(id);
 
     }
