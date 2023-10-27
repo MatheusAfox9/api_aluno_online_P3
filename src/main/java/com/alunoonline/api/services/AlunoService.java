@@ -1,6 +1,7 @@
 package com.alunoonline.api.services;
 
 
+import com.alunoonline.api.dto.AlunoDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
 import com.alunoonline.api.model.Aluno;
@@ -50,14 +51,20 @@ public class AlunoService {
     }
 
 
-    public Aluno update(Long id, Aluno aluno) {
+    public Aluno update(Long id, AlunoDTO alunoDTO) {
         Aluno alunoToUpdate = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id, "Aluno"));
 
 
-        alunoToUpdate.setNome(aluno.getNome());
-        alunoToUpdate.setEmail(aluno.getEmail());
-        alunoToUpdate.setCurso(aluno.getCurso());
+        if (alunoDTO.getNome() != null) {
+            alunoToUpdate.setNome(alunoDTO.getNome());
+        }
+        if (alunoDTO.getEmail() != null) {
+            alunoToUpdate.setEmail(alunoDTO.getEmail());
+        }
+        if (alunoDTO.getCurso() != null) {
+            alunoToUpdate.setCurso(alunoDTO.getCurso());
+        }
 
         Aluno alunoAtualizado = repository.save(alunoToUpdate);
 

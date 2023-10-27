@@ -1,6 +1,7 @@
 package com.alunoonline.api.controller;
 
 
+import com.alunoonline.api.dto.DisciplinaDTO;
 import com.alunoonline.api.model.Disciplina;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.services.DisciplinaService;
@@ -44,9 +45,9 @@ public class DisciplinaController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Disciplina> update(@PathVariable Long id, @RequestBody Disciplina disciplina) {
+    public ResponseEntity<Disciplina> update(@PathVariable Long id, @RequestBody DisciplinaDTO disciplinaDTO) {
 
-        Disciplina disciplinaAtualizado = service.update(id, disciplina);
+        Disciplina disciplinaAtualizado = service.update(id, disciplinaDTO);
 
 
         return ResponseEntity.status(200).body(disciplinaAtualizado);
@@ -57,6 +58,12 @@ public class DisciplinaController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id){
         service.delete(id);
+    }
+
+    @GetMapping("/professor/{professorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Disciplina> findByProfessorId(@PathVariable Long professorId){
+        return service.findByProfessorId(professorId);
     }
 
 

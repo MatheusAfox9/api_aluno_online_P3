@@ -1,5 +1,6 @@
 package com.alunoonline.api.services;
 
+import com.alunoonline.api.dto.ProfessorDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
 import com.alunoonline.api.exception.InformacaoProfessorDuplicadaException;
@@ -45,13 +46,20 @@ public class ProfessorService {
     }
 
 
-    public Professor update(Long id, Professor professor) {
+    public Professor update(Long id, ProfessorDTO professorDTO) {
         Professor professorToUpdate = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
 
 
-        professorToUpdate.setNome(professor.getNome());
-        professorToUpdate.setEmail(professor.getEmail());
+
+        if (professorDTO.getNome() != null) {
+            professorToUpdate.setNome(professorDTO.getNome());
+        }
+
+        if (professorDTO.getEmail() != null) {
+            professorToUpdate.setEmail(professorDTO.getEmail());
+        }
+
 
 
         Professor professorAtualizado = repository.save(professorToUpdate);

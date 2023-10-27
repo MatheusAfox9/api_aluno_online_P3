@@ -1,5 +1,6 @@
 package com.alunoonline.api.controller;
 
+import com.alunoonline.api.dto.ProfessorDTO;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.services.AlunoService;
@@ -43,7 +44,7 @@ public class ProfessorController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Professor> update(@PathVariable Long id, @RequestBody Professor professor) {
+    public ResponseEntity<Professor> update(@PathVariable Long id, @RequestBody ProfessorDTO professor) {
 
         Professor professorAtualizado = service.update(id, professor);
 

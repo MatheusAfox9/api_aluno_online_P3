@@ -36,6 +36,12 @@ public class HandleException {
 
     }
 
+    @ExceptionHandler(NenhumCampoAlteradoException.class)
+    public ResponseEntity<String> handleNenhumCampoAlterado(NenhumCampoAlteradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(ex.getMessage());
+    }
+
+
 
 
 }

@@ -1,8 +1,10 @@
 package com.alunoonline.api.services;
 
 
+import com.alunoonline.api.dto.DisciplinaDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoDisciplinaDuplicadaException;
+import com.alunoonline.api.exception.NenhumCampoAlteradoException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Disciplina;
 import com.alunoonline.api.model.Professor;
@@ -52,18 +54,28 @@ public class DisciplinaService {
 
     }
 
-    public Disciplina update(Long id, Disciplina disciplina) {
+    public Disciplina update(Long id, DisciplinaDTO disciplinaDTO) {
         Disciplina disciplinaToUpdate = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id, "Disciplina"));
 
-        // Buscando os detalhes completos do professor a partir do ID fornecido
-        Professor professor = professorRepository.findById(disciplina.getProfessor().getId())
-                .orElseThrow(() -> new IdNaoEncontradoException(disciplina.getProfessor().getId(), "Professor"));
+        boolean alterado = false;
+
+        if (disciplinaDTO.getNome() != null && !disciplinaDTO.getNome().equals(disciplinaToUpdate.getNome())){
+            disciplinaToUpdate.setNome(disciplinaDTO.getNome());
+            alterado = true;
+        }
+
+        if (disciplinaDTO.getProfessor() != null && (disciplinaToUpdate.getProfessor() == null || !disciplinaDTO.getProfessor().getId().equals(disciplinaToUpdate.getProfessor().getId()))) {
+            Professor professor = professorRepository.findById(disciplinaDTO.getProfessor().getId())
+                    .orElseThrow(() -> new IdNaoEncontradoException(disciplinaDTO.getProfessor().getId(), "Professor"));
+            disciplinaToUpdate.setProfessor(professor);
+            alterado = true;
+        }
 
 
-        disciplinaToUpdate.setNome(disciplina.getNome());
-        disciplinaToUpdate.setProfessor(professor);
-
+        if (!alterado) {
+            throw new NenhumCampoAlteradoException("Disciplina");
+        }
 
         Disciplina disciplinaAtualizado = repository.save(disciplinaToUpdate);
 
@@ -80,5 +92,14 @@ public class DisciplinaService {
         repository.deleteById(id);
 
     }
+
+    public List<Disciplina> findByProfessorId(Long professorId){
+        return repository.findByProfessorId(professorId);
+
+
+
+    }
+
+
 
 }

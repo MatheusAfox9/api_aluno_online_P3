@@ -2,6 +2,7 @@ package com.alunoonline.api.controller;
 
 
 
+import com.alunoonline.api.dto.AlunoDTO;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.services.AlunoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class AlunoController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Aluno> update(@PathVariable Long id, @RequestBody Aluno aluno) {
+    public ResponseEntity<Aluno> update(@PathVariable Long id, @RequestBody AlunoDTO aluno) {
 
         Aluno alunoAtualizado = service.update(id, aluno);
 
