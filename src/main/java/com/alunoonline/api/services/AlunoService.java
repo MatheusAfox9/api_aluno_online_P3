@@ -4,6 +4,7 @@ package com.alunoonline.api.services;
 import com.alunoonline.api.dto.AlunoDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
+import com.alunoonline.api.exception.NenhumCampoAlteradoException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
@@ -55,15 +56,25 @@ public class AlunoService {
         Aluno alunoToUpdate = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id, "Aluno"));
 
+        boolean alterado = false;
 
-        if (alunoDTO.getNome() != null) {
+
+        if (alunoDTO.getNome() != null && !alunoDTO.getNome().equals(alunoToUpdate.getNome())) {
             alunoToUpdate.setNome(alunoDTO.getNome());
+            alterado = true;
         }
-        if (alunoDTO.getEmail() != null) {
+        if (alunoDTO.getEmail() != null && !alunoDTO.getEmail().equals(alunoToUpdate.getEmail())) {
             alunoToUpdate.setEmail(alunoDTO.getEmail());
+            alterado = true;
         }
-        if (alunoDTO.getCurso() != null) {
+        if (alunoDTO.getCurso() != null && !alunoDTO.getCurso().equals(alunoToUpdate.getCurso())) {
             alunoToUpdate.setCurso(alunoDTO.getCurso());
+            alterado = true;
+        }
+
+        if (!alterado) {
+            String nomeParaMensagem = alunoDTO.getNome() != null ? alunoDTO.getNome() : alunoToUpdate.getNome();
+            throw new NenhumCampoAlteradoException(nomeParaMensagem);
         }
 
         Aluno alunoAtualizado = repository.save(alunoToUpdate);

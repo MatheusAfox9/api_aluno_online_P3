@@ -74,7 +74,8 @@ public class DisciplinaService {
 
 
         if (!alterado) {
-            throw new NenhumCampoAlteradoException("Disciplina");
+            String nomeParaMensagem = disciplinaDTO.getNome() != null ? disciplinaDTO.getNome() : disciplinaToUpdate.getNome();
+            throw new NenhumCampoAlteradoException(nomeParaMensagem);
         }
 
         Disciplina disciplinaAtualizado = repository.save(disciplinaToUpdate);

@@ -4,6 +4,7 @@ import com.alunoonline.api.dto.ProfessorDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
 import com.alunoonline.api.exception.InformacaoProfessorDuplicadaException;
+import com.alunoonline.api.exception.NenhumCampoAlteradoException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
@@ -50,16 +51,24 @@ public class ProfessorService {
         Professor professorToUpdate = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
 
+        boolean alterado = false;
 
 
-        if (professorDTO.getNome() != null) {
+
+        if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professorToUpdate.getNome())) {
             professorToUpdate.setNome(professorDTO.getNome());
+            alterado = true;
         }
 
-        if (professorDTO.getEmail() != null) {
+        if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professorToUpdate.getEmail())) {
             professorToUpdate.setEmail(professorDTO.getEmail());
+            alterado = true;
         }
 
+        if (!alterado) {
+            String nomeParaMensagem = professorDTO.getNome() != null ? professorDTO.getNome() : professorToUpdate.getNome();
+            throw new NenhumCampoAlteradoException(nomeParaMensagem);
+        }
 
 
         Professor professorAtualizado = repository.save(professorToUpdate);
