@@ -55,30 +55,29 @@ public class DisciplinaService {
     }
 
     public Disciplina update(Long id, DisciplinaDTO disciplinaDTO) {
-        Disciplina disciplinaToUpdate = repository.findById(id)
+        Disciplina disciplinaAtual = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id, "Disciplina"));
 
-        boolean alterado = false;
+        boolean foiAlterado = false;
 
-        if (disciplinaDTO.getNome() != null && !disciplinaDTO.getNome().equals(disciplinaToUpdate.getNome())){
-            disciplinaToUpdate.setNome(disciplinaDTO.getNome());
-            alterado = true;
+        if (disciplinaDTO.getNome() != null && !disciplinaDTO.getNome().equals(disciplinaAtual.getNome())){
+            disciplinaAtual.setNome(disciplinaDTO.getNome());
+            foiAlterado = true;
         }
 
-        if (disciplinaDTO.getProfessor() != null && (disciplinaToUpdate.getProfessor() == null || !disciplinaDTO.getProfessor().getId().equals(disciplinaToUpdate.getProfessor().getId()))) {
+        if (disciplinaDTO.getProfessor() != null && (disciplinaAtual.getProfessor() == null || !disciplinaDTO.getProfessor().getId().equals(disciplinaAtual.getProfessor().getId()))) {
             Professor professor = professorRepository.findById(disciplinaDTO.getProfessor().getId())
                     .orElseThrow(() -> new IdNaoEncontradoException(disciplinaDTO.getProfessor().getId(), "Professor"));
-            disciplinaToUpdate.setProfessor(professor);
-            alterado = true;
+            disciplinaAtual.setProfessor(professor);
+            foiAlterado = true;
         }
 
 
-        if (!alterado) {
-            String nomeParaMensagem = disciplinaDTO.getNome() != null ? disciplinaDTO.getNome() : disciplinaToUpdate.getNome();
-            throw new NenhumCampoAlteradoException(nomeParaMensagem);
+        if (!foiAlterado) {
+            throw new NenhumCampoAlteradoException();
         }
 
-        Disciplina disciplinaAtualizado = repository.save(disciplinaToUpdate);
+        Disciplina disciplinaAtualizado = repository.save(disciplinaAtual);
 
         return disciplinaAtualizado;
 

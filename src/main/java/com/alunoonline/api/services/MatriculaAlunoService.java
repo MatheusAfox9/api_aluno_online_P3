@@ -14,6 +14,8 @@ public class MatriculaAlunoService {
 
     public void create(MatriculaAluno matriculaAluno) {
 
+        boolean matriculaAlunoExists = repository
+
         matriculaAluno.setStatus(StatusMatricula.MATRICULADO);
 
         repository.save(matriculaAluno);

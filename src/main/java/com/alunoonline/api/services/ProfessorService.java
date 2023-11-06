@@ -48,30 +48,29 @@ public class ProfessorService {
 
 
     public Professor update(Long id, ProfessorDTO professorDTO) {
-        Professor professorToUpdate = repository.findById(id)
+        Professor professorAtual = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
 
-        boolean alterado = false;
+        boolean foiAlterado = false;
 
 
 
-        if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professorToUpdate.getNome())) {
-            professorToUpdate.setNome(professorDTO.getNome());
-            alterado = true;
+        if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professorAtual.getNome())) {
+            professorAtual.setNome(professorDTO.getNome());
+            foiAlterado = true;
         }
 
-        if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professorToUpdate.getEmail())) {
-            professorToUpdate.setEmail(professorDTO.getEmail());
-            alterado = true;
+        if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professorAtual.getEmail())) {
+            professorAtual.setEmail(professorDTO.getEmail());
+            foiAlterado = true;
         }
 
-        if (!alterado) {
-            String nomeParaMensagem = professorDTO.getNome() != null ? professorDTO.getNome() : professorToUpdate.getNome();
-            throw new NenhumCampoAlteradoException(nomeParaMensagem);
+        if (!foiAlterado) {
+            throw new NenhumCampoAlteradoException();
         }
 
 
-        Professor professorAtualizado = repository.save(professorToUpdate);
+        Professor professorAtualizado = repository.save(professorAtual);
 
         return professorAtualizado;
     }

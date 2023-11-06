@@ -53,31 +53,30 @@ public class AlunoService {
 
 
     public Aluno update(Long id, AlunoDTO alunoDTO) {
-        Aluno alunoToUpdate = repository.findById(id)
+        Aluno alunoAtual = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException(id, "Aluno"));
 
-        boolean alterado = false;
+        boolean foiAlterado = false;
 
 
-        if (alunoDTO.getNome() != null && !alunoDTO.getNome().equals(alunoToUpdate.getNome())) {
-            alunoToUpdate.setNome(alunoDTO.getNome());
-            alterado = true;
+        if (alunoDTO.getNome() != null && !alunoDTO.getNome().equals(alunoAtual.getNome())) {
+            alunoAtual.setNome(alunoDTO.getNome());
+            foiAlterado = true;
         }
-        if (alunoDTO.getEmail() != null && !alunoDTO.getEmail().equals(alunoToUpdate.getEmail())) {
-            alunoToUpdate.setEmail(alunoDTO.getEmail());
-            alterado = true;
+        if (alunoDTO.getEmail() != null && !alunoDTO.getEmail().equals(alunoAtual.getEmail())) {
+            alunoAtual.setEmail(alunoDTO.getEmail());
+            foiAlterado = true;
         }
-        if (alunoDTO.getCurso() != null && !alunoDTO.getCurso().equals(alunoToUpdate.getCurso())) {
-            alunoToUpdate.setCurso(alunoDTO.getCurso());
-            alterado = true;
-        }
-
-        if (!alterado) {
-            String nomeParaMensagem = alunoDTO.getNome() != null ? alunoDTO.getNome() : alunoToUpdate.getNome();
-            throw new NenhumCampoAlteradoException(nomeParaMensagem);
+        if (alunoDTO.getCurso() != null && !alunoDTO.getCurso().equals(alunoAtual.getCurso())) {
+            alunoAtual.setCurso(alunoDTO.getCurso());
+            foiAlterado = true;
         }
 
-        Aluno alunoAtualizado = repository.save(alunoToUpdate);
+        if (!foiAlterado) {
+            throw new NenhumCampoAlteradoException();
+        }
+
+        Aluno alunoAtualizado = repository.save(alunoAtual);
 
         return alunoAtualizado;
     }

@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class DisciplinaDTO {
 
-    private Long id;
 
     private String nome;
 
