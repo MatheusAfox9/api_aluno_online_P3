@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,15 @@ public class Aluno {
     // Identity é a identidade de um e um
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     private Long id;
+
+    @NotBlank (message = "O nome é obrigatório.")
     private String nome;
+
+    @NotBlank (message = "O email é obrigatório.")
     private String email;
+
+    @NotBlank (message = "O curso é obrigatório.")
     private String curso;
 
 

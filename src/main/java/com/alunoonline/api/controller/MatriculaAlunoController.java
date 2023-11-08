@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sound.midi.Patch;
+
 @RestController
 @RequestMapping("/matricula-aluno")
 public class MatriculaAlunoController {
@@ -28,6 +30,12 @@ public class MatriculaAlunoController {
         service.updateStatus(id, statusDTO.getStatus());
         return ResponseEntity.noContent().build();
     }
+
+    /*@PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patchNotas(
+            @RequestBody Patch
+            )*/
 
 
 

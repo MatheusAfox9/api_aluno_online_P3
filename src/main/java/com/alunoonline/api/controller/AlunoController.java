@@ -5,6 +5,7 @@ package com.alunoonline.api.controller;
 import com.alunoonline.api.dto.AlunoDTO;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.services.AlunoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,10 @@ public class AlunoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Aluno> create(@RequestBody Aluno aluno){
+    public ResponseEntity<Aluno> create(@Valid @RequestBody Aluno aluno){
         Aluno alunoCreated = service.create(aluno);
 
-        return ResponseEntity.status(201).body(alunoCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(alunoCreated);
 
     }
 

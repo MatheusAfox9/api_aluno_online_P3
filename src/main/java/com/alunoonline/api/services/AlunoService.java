@@ -5,6 +5,7 @@ import com.alunoonline.api.dto.AlunoDTO;
 import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
 import com.alunoonline.api.exception.NenhumCampoAlteradoException;
+import com.alunoonline.api.exception.ValidacaoAlunoException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
@@ -12,6 +13,8 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +33,8 @@ public class AlunoService {
 
     public Aluno create(Aluno aluno) {
 
+        validateAluno(aluno);
+
         boolean alunoExists = repository.existsByNomeAndEmailAndCurso(aluno.getNome(), aluno.getEmail(), aluno.getCurso());
         if (alunoExists) {
             throw new InformacaoAlunoDuplicadaException(aluno.getNome(), aluno.getEmail(), aluno.getCurso());
@@ -39,6 +44,33 @@ public class AlunoService {
 
 
     }
+
+    private void validateAluno(Aluno aluno) {
+        List<String> missingFields = new ArrayList<>();
+
+        if (isNullOrEmpty(aluno.getNome())) {
+            missingFields.add("nome");
+        }
+        if (isNullOrEmpty(aluno.getEmail())) {
+            missingFields.add("email");
+        }
+        if (isNullOrEmpty(aluno.getCurso())) {
+            missingFields.add("curso");
+        }
+
+        if (!missingFields.isEmpty()) {
+            throw new ValidacaoAlunoException(String.join(", ", missingFields));
+        }
+    }
+
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+
+
+
 
     public List<Aluno> findAll() {
         repository.findAll();

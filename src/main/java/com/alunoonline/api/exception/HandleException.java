@@ -42,6 +42,13 @@ public class HandleException {
         return ResponseEntity.ok(exception.getMessage());
     }
 
+    @ExceptionHandler(ValidacaoAlunoException.class)
+    public ResponseEntity<String> handleAlunoValidationException(ValidacaoAlunoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+
+
 
 
 
