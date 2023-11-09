@@ -1,10 +1,7 @@
 package com.alunoonline.api.services;
 
 import com.alunoonline.api.dto.ProfessorDTO;
-import com.alunoonline.api.exception.IdNaoEncontradoException;
-import com.alunoonline.api.exception.InformacaoAlunoDuplicadaException;
-import com.alunoonline.api.exception.InformacaoProfessorDuplicadaException;
-import com.alunoonline.api.exception.NenhumCampoAlteradoException;
+import com.alunoonline.api.exception.*;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.AlunoRepository;
@@ -12,6 +9,7 @@ import com.alunoonline.api.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,12 +22,39 @@ public class ProfessorService {
 
     public Professor create(Professor professor) {
 
+        validateProfessor(professor);
+
+        validateRegistrationDuplicationProfessor(professor);
+
+        return repository.save(professor);
+    }
+
+
+    private void validateProfessor(Professor professor) {
+        List<String> missingFields = new ArrayList<>();
+
+        if (isNullOrEmpty(professor.getNome())) {
+            missingFields.add("nome");
+        }
+        if (isNullOrEmpty(professor.getEmail())) {
+            missingFields.add("email");
+        }
+
+        if (!missingFields.isEmpty()) {
+            throw new ValidacaoProfessorException(String.join(", ", missingFields));
+        }
+    }
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private void validateRegistrationDuplicationProfessor(Professor professor){
+
         boolean professorExists = repository.existsByNomeAndEmail(professor.getNome(), professor.getEmail());
         if (professorExists) {
             throw new InformacaoProfessorDuplicadaException(professor.getNome(), professor.getEmail());
         }
-
-        return repository.save(professor);
     }
 
 

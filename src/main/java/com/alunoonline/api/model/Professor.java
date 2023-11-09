@@ -17,7 +17,7 @@ public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
+
     private Long id;
     private String nome;
     private String email;

@@ -43,7 +43,17 @@ public class HandleException {
     }
 
     @ExceptionHandler(ValidacaoAlunoException.class)
-    public ResponseEntity<String> handleAlunoValidationException(ValidacaoAlunoException ex) {
+    public ResponseEntity<String> handleValidacaoAlunoException(ValidacaoAlunoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidacaoProfessorException.class)
+    public ResponseEntity<String> handleValidacaoProfessorException(ValidacaoProfessorException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidacaoDisciplinaException.class)
+    public ResponseEntity<String> handleValidacaoDisciplinarException(ValidacaoDisciplinaException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

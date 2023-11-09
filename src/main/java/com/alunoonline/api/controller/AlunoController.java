@@ -25,7 +25,7 @@ public class AlunoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Aluno> create(@Valid @RequestBody Aluno aluno){
+    public ResponseEntity<Aluno> create(@RequestBody Aluno aluno){
         Aluno alunoCreated = service.create(aluno);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(alunoCreated);

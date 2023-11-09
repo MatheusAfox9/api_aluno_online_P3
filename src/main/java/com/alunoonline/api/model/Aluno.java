@@ -27,13 +27,11 @@ public class Aluno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank (message = "O nome é obrigatório.")
+
     private String nome;
 
-    @NotBlank (message = "O email é obrigatório.")
     private String email;
 
-    @NotBlank (message = "O curso é obrigatório.")
     private String curso;
 
 

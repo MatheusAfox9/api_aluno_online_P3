@@ -5,6 +5,7 @@ import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.services.AlunoService;
 import com.alunoonline.api.services.ProfessorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class ProfessorController {
     public ResponseEntity<Professor> create(@RequestBody Professor professor){
         Professor professorCreated = service.create(professor);
 
-        return ResponseEntity.status(201).body(professorCreated);
+        return ResponseEntity.status(HttpStatus.CREATED).body(professorCreated);
 
     }
 
