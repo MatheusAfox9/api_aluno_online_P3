@@ -65,11 +65,20 @@ public class ProfessorService {
     }
 
     public Professor findById(Long id) {
-
-        return repository.findById(id)
-                .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
+        validateProfessorExists(id);
+        return repository.findById(id).get();
 
     }
+
+    private void validateProfessorExists(Long id){
+
+        if (!repository.existsById(id)) {
+            throw new IdNaoEncontradoException(id, "Professor");
+        }
+
+    }
+
+
 
 
     public Professor update(Long id, ProfessorDTO professorDTO) {
@@ -78,14 +87,16 @@ public class ProfessorService {
 
         boolean foiAlterado = false;
 
-
-
+        // Verifica se o nome foi alterado e é único
         if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professorAtual.getNome())) {
+            validateUniqueProfessor(professorDTO.getNome(), professorAtual.getEmail(), id);
             professorAtual.setNome(professorDTO.getNome());
             foiAlterado = true;
         }
 
+        // Verifica se o email foi alterado e é único
         if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professorAtual.getEmail())) {
+            validateUniqueProfessor(professorAtual.getNome(), professorDTO.getEmail(), id);
             professorAtual.setEmail(professorDTO.getEmail());
             foiAlterado = true;
         }
@@ -94,12 +105,19 @@ public class ProfessorService {
             throw new NenhumCampoAlteradoException();
         }
 
-
-        Professor professorAtualizado = repository.save(professorAtual);
-
-        return professorAtualizado;
+        return repository.save(professorAtual);
     }
 
+
+    private void validateUniqueProfessor(String nome, String email, Long id) {
+        List<Professor> professoresEncontrados = repository.findByNomeAndEmail(nome, email);
+
+        for (Professor professor : professoresEncontrados) {
+            if (!professor.getId().equals(id)) {
+                throw new InformacaoProfessorDuplicadaException(professor.getNome(), professor.getEmail());
+            }
+        }
+    }
 
 
     public void delete(Long id) {

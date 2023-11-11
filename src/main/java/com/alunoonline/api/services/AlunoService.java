@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //Preciso informar para o spring que é um service - usa a anotação service
 @Service
@@ -74,8 +75,16 @@ public class AlunoService {
     }
 
     public Aluno findById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IdNaoEncontradoException(id,"Aluno"));
+        validateAlunoExists(id);
+        return repository.findById(id).get();
+    }
+
+    private void validateAlunoExists(Long id){
+
+        if (!repository.existsById(id)) {
+            throw new IdNaoEncontradoException(id, "Aluno");
+        }
+
     }
 
 
@@ -87,14 +96,18 @@ public class AlunoService {
 
 
         if (alunoDTO.getNome() != null && !alunoDTO.getNome().equals(alunoAtual.getNome())) {
+            validateUniqueAluno(alunoDTO.getNome(), alunoAtual.getEmail(), alunoAtual.getCurso(), id);
             alunoAtual.setNome(alunoDTO.getNome());
             foiAlterado = true;
         }
+
         if (alunoDTO.getEmail() != null && !alunoDTO.getEmail().equals(alunoAtual.getEmail())) {
+            validateUniqueAluno(alunoAtual.getNome(), alunoDTO.getEmail(), alunoAtual.getCurso(), id);
             alunoAtual.setEmail(alunoDTO.getEmail());
             foiAlterado = true;
         }
         if (alunoDTO.getCurso() != null && !alunoDTO.getCurso().equals(alunoAtual.getCurso())) {
+            validateUniqueAluno(alunoAtual.getNome(), alunoAtual.getEmail(), alunoDTO.getCurso(), id);
             alunoAtual.setCurso(alunoDTO.getCurso());
             foiAlterado = true;
         }
@@ -103,11 +116,20 @@ public class AlunoService {
             throw new NenhumCampoAlteradoException();
         }
 
-        Aluno alunoAtualizado = repository.save(alunoAtual);
+        return repository.save(alunoAtual);
 
-        return alunoAtualizado;
     }
 
+    private void validateUniqueAluno(String nome, String email, String curso, Long id) {
+        List<Aluno> alunosEncontrados = repository.findByNomeAndEmailAndCurso(nome, email, curso);
+
+        for (Aluno aluno : alunosEncontrados) {
+            if (!aluno.getId().equals(id)) {
+                // Encontrou um aluno existente com os mesmos dados, mas com um ID diferente
+                throw new InformacaoAlunoDuplicadaException(aluno.getNome(), aluno.getEmail(), aluno.getCurso());
+            }
+        }
+    }
 
     public void delete(Long id) {
 

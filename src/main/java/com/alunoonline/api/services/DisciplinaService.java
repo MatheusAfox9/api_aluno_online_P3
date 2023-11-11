@@ -3,7 +3,6 @@ package com.alunoonline.api.services;
 
 import com.alunoonline.api.dto.DisciplinaDTO;
 import com.alunoonline.api.exception.*;
-import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Disciplina;
 import com.alunoonline.api.model.Professor;
 import com.alunoonline.api.repository.DisciplinaRepository;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DisciplinaService {
@@ -26,21 +24,14 @@ public class DisciplinaService {
 
     public Disciplina create(Disciplina disciplina) {
 
-
         validateDisciplina(disciplina);
 
-        Professor professor = professorRepository.findById(disciplina.getProfessor().getId())
-                .orElseThrow(() -> new IdNaoEncontradoException(disciplina.getProfessor().getId(), "Professor"));
+        Professor professor = validateProfessorExists(disciplina.getProfessor().getId());
 
-
-        boolean disciplinaExists = repository.existsByNomeAndProfessor(disciplina.getNome(), professor);
-        if (disciplinaExists) {
-            throw new InformacaoDisciplinaDuplicadaException(disciplina.getNome(), professor.getNome());
-        }
+        validateRegistrationDuplicationDisciplina(disciplina.getNome(), professor);
 
         disciplina.setProfessor(professor);
         return repository.save(disciplina);
-
     }
 
     private void validateDisciplina(Disciplina disciplina) {
@@ -53,7 +44,6 @@ public class DisciplinaService {
             missingFields.add("professor");
         }
 
-
         if (!missingFields.isEmpty()) {
             throw new ValidacaoDisciplinaException(String.join(", ", missingFields));
         }
@@ -63,14 +53,19 @@ public class DisciplinaService {
         return value == null || value.trim().isEmpty();
     }
 
-    private void validateIdNotFoundDisciplina (Disciplina disciplina){
+    private Professor validateProfessorExists(Long id){
 
+        return professorRepository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id, "Professor"));
     }
 
-    private void validateRegistrationDuplicationDisciplina (Disciplina disciplina){
+    private void validateRegistrationDuplicationDisciplina (String nomeDisciplina, Professor professor){
 
+        boolean disciplinaExists = repository.existsByNomeAndProfessor(nomeDisciplina, professor);
+        if (disciplinaExists) {
+            throw new InformacaoDisciplinaDuplicadaException(nomeDisciplina, professor.getNome());
+        }
     }
-
 
 
     public List<Disciplina> findAll() {
@@ -80,11 +75,19 @@ public class DisciplinaService {
     }
 
     public Disciplina findById(Long id) {
-
-        return repository.findById(id)
-                .orElseThrow(() -> new IdNaoEncontradoException(id, "Disciplina"));
+        validateDisciplinaExists(id);
+        return repository.findById(id).get();
 
     }
+
+    private void validateDisciplinaExists(Long id){
+
+        if (!repository.existsById(id)) {
+            throw new IdNaoEncontradoException(id, "Disciplina");
+        }
+
+    }
+
 
     public Disciplina update(Long id, DisciplinaDTO disciplinaDTO) {
         Disciplina disciplinaAtual = repository.findById(id)

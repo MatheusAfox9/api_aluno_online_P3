@@ -43,7 +43,7 @@ public class ProfessorController {
         return service.findById(id);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Professor> update(@PathVariable Long id, @RequestBody ProfessorDTO professor) {
 

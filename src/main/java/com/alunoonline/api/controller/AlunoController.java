@@ -46,7 +46,7 @@ public class AlunoController {
     }
 
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Aluno> update(@PathVariable Long id, @RequestBody AlunoDTO aluno) {
 

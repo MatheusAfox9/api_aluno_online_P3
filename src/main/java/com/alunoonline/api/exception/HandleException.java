@@ -32,14 +32,14 @@ public class HandleException {
 
     @ExceptionHandler(IdNaoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> idNaoEncontradoException(IdNaoEncontradoException exception) {
+    public ResponseEntity<String> handleidNaoEncontradoException(IdNaoEncontradoException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
 
     }
 
     @ExceptionHandler(NenhumCampoAlteradoException.class)
-    public ResponseEntity<String> nenhumCampoAlteradoException(NenhumCampoAlteradoException exception) {
-        return ResponseEntity.ok(exception.getMessage());
+    public ResponseEntity<String> handlenenhumCampoAlteradoException(NenhumCampoAlteradoException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 
     @ExceptionHandler(ValidacaoAlunoException.class)

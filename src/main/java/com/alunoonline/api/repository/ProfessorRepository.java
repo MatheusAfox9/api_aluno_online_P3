@@ -16,6 +16,8 @@ public interface ProfessorRepository extends JpaRepository <Professor, Long> {
 
     boolean existsByNomeAndEmail(String nome, String email);
 
+    List<Professor> findByNomeAndEmail(String nome, String email);
+
 
 
 }

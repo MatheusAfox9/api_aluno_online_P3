@@ -4,6 +4,7 @@ import com.alunoonline.api.model.Aluno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 //@Repository é a ponte
@@ -13,5 +14,8 @@ import java.util.Optional;
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     boolean existsByNomeAndEmailAndCurso(String nome, String email, String curso);
+
+    List<Aluno> findByNomeAndEmailAndCurso(String nome, String email, String curso);
+
 }
  
