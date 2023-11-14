@@ -53,8 +53,18 @@ public class HandleException {
     }
 
     @ExceptionHandler(ValidacaoDisciplinaException.class)
-    public ResponseEntity<String> handleValidacaoDisciplinarException(ValidacaoDisciplinaException ex) {
+    public ResponseEntity<String> handleValidacaoDisciplinaException(ValidacaoDisciplinaException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidacaoMatriculaException.class)
+    public ResponseEntity<String> handleValidacaoMatriculaException(ValidacaoMatriculaException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InformacaoMatriculaDuplicadaException.class)
+    public ResponseEntity<String> handleInformacaoMatriculaDuplicadaException(InformacaoMatriculaDuplicadaException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 
 

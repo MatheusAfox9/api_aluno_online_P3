@@ -2,16 +2,13 @@ package com.alunoonline.api.services;
 
 import com.alunoonline.api.dto.ProfessorDTO;
 import com.alunoonline.api.exception.*;
-import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Professor;
-import com.alunoonline.api.repository.AlunoRepository;
 import com.alunoonline.api.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProfessorService {
@@ -79,35 +76,46 @@ public class ProfessorService {
     }
 
 
-
-
     public Professor update(Long id, ProfessorDTO professorDTO) {
-        Professor professorAtual = repository.findById(id)
-                .orElseThrow(() -> new IdNaoEncontradoException(id,"Professor"));
+        Professor professorAtual = searchByIdProfessor(id);
 
         boolean foiAlterado = false;
+        foiAlterado |= updateNameProfessor(professorAtual, professorDTO);
+        foiAlterado |= updateEmailProfessor(professorAtual, professorDTO);
 
-        // Verifica se o nome foi alterado e é único
-        if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professorAtual.getNome())) {
-            validateUniqueProfessor(professorDTO.getNome(), professorAtual.getEmail(), id);
-            professorAtual.setNome(professorDTO.getNome());
-            foiAlterado = true;
-        }
-
-        // Verifica se o email foi alterado e é único
-        if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professorAtual.getEmail())) {
-            validateUniqueProfessor(professorAtual.getNome(), professorDTO.getEmail(), id);
-            professorAtual.setEmail(professorDTO.getEmail());
-            foiAlterado = true;
-        }
-
-        if (!foiAlterado) {
-            throw new NenhumCampoAlteradoException();
-        }
+        checkChangeProfessor(foiAlterado);
 
         return repository.save(professorAtual);
     }
 
+    private Professor searchByIdProfessor(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id, "Professor"));
+    }
+
+    private void checkChangeProfessor(boolean foiAlterado) {
+        if (!foiAlterado) {
+            throw new NenhumCampoAlteradoException();
+        }
+    }
+
+    private boolean updateNameProfessor(Professor professor, ProfessorDTO professorDTO) {
+        if (professorDTO.getNome() != null && !professorDTO.getNome().equals(professor.getNome())) {
+            validateUniqueProfessor(professorDTO.getNome(), professor.getEmail(), professor.getId());
+            professor.setNome(professorDTO.getNome());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean updateEmailProfessor(Professor professor, ProfessorDTO professorDTO) {
+        if (professorDTO.getEmail() != null && !professorDTO.getEmail().equals(professor.getEmail())) {
+            validateUniqueProfessor(professor.getNome(), professorDTO.getEmail(), professor.getId());
+            professor.setEmail(professorDTO.getEmail());
+            return true;
+        }
+        return false;
+    }
 
     private void validateUniqueProfessor(String nome, String email, Long id) {
         List<Professor> professoresEncontrados = repository.findByNomeAndEmail(nome, email);

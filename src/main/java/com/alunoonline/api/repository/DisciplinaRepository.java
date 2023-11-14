@@ -15,6 +15,8 @@ public interface DisciplinaRepository extends JpaRepository<Disciplina, Long>  {
 
     List<Disciplina> findByProfessorId(Long professorId);
 
+    List<Disciplina> findByNomeAndProfessor(String nome, Professor professor);
+
 
 }
 

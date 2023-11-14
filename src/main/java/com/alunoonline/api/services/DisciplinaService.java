@@ -17,7 +17,7 @@ import java.util.List;
 public class DisciplinaService {
 
     @Autowired
-    DisciplinaRepository repository;
+    DisciplinaRepository disciplinaRepository;
 
     @Autowired
     ProfessorRepository professorRepository;
@@ -31,7 +31,7 @@ public class DisciplinaService {
         validateRegistrationDuplicationDisciplina(disciplina.getNome(), professor);
 
         disciplina.setProfessor(professor);
-        return repository.save(disciplina);
+        return disciplinaRepository.save(disciplina);
     }
 
     private void validateDisciplina(Disciplina disciplina) {
@@ -61,7 +61,7 @@ public class DisciplinaService {
 
     private void validateRegistrationDuplicationDisciplina (String nomeDisciplina, Professor professor){
 
-        boolean disciplinaExists = repository.existsByNomeAndProfessor(nomeDisciplina, professor);
+        boolean disciplinaExists = disciplinaRepository.existsByNomeAndProfessor(nomeDisciplina, professor);
         if (disciplinaExists) {
             throw new InformacaoDisciplinaDuplicadaException(nomeDisciplina, professor.getNome());
         }
@@ -69,20 +69,20 @@ public class DisciplinaService {
 
 
     public List<Disciplina> findAll() {
-        repository.findAll();
-        return repository.findAll();
+        disciplinaRepository.findAll();
+        return disciplinaRepository.findAll();
 
     }
 
     public Disciplina findById(Long id) {
         validateDisciplinaExists(id);
-        return repository.findById(id).get();
+        return disciplinaRepository.findById(id).get();
 
     }
 
     private void validateDisciplinaExists(Long id){
 
-        if (!repository.existsById(id)) {
+        if (!disciplinaRepository.existsById(id)) {
             throw new IdNaoEncontradoException(id, "Disciplina");
         }
 
@@ -90,46 +90,71 @@ public class DisciplinaService {
 
 
     public Disciplina update(Long id, DisciplinaDTO disciplinaDTO) {
-        Disciplina disciplinaAtual = repository.findById(id)
-                .orElseThrow(() -> new IdNaoEncontradoException(id, "Disciplina"));
+        Disciplina disciplinaAtual = buscarDisciplinaPorId(id);
 
         boolean foiAlterado = false;
+        foiAlterado |= updateNomeDisciplina(disciplinaAtual, disciplinaDTO);
+        foiAlterado |= updateProfessorDisciplina(disciplinaAtual, disciplinaDTO);
 
-        if (disciplinaDTO.getNome() != null && !disciplinaDTO.getNome().equals(disciplinaAtual.getNome())){
-            disciplinaAtual.setNome(disciplinaDTO.getNome());
-            foiAlterado = true;
-        }
+        verificarSeHouveAlteracao(foiAlterado);
 
-        if (disciplinaDTO.getProfessor() != null && (disciplinaAtual.getProfessor() == null || !disciplinaDTO.getProfessor().getId().equals(disciplinaAtual.getProfessor().getId()))) {
-            Professor professor = professorRepository.findById(disciplinaDTO.getProfessor().getId())
-                    .orElseThrow(() -> new IdNaoEncontradoException(disciplinaDTO.getProfessor().getId(), "Professor"));
-            disciplinaAtual.setProfessor(professor);
-            foiAlterado = true;
-        }
+        return disciplinaRepository.save(disciplinaAtual);
+    }
 
+    private Disciplina buscarDisciplinaPorId(Long id) {
+        return disciplinaRepository.findById(id)
+                .orElseThrow(() -> new IdNaoEncontradoException(id, "Disciplina"));
+    }
 
+    private void verificarSeHouveAlteracao(boolean foiAlterado) {
         if (!foiAlterado) {
             throw new NenhumCampoAlteradoException();
         }
-
-        Disciplina disciplinaAtualizado = repository.save(disciplinaAtual);
-
-        return disciplinaAtualizado;
-
     }
+
+    private boolean updateNomeDisciplina(Disciplina disciplina, DisciplinaDTO disciplinaDTO) {
+        if (disciplinaDTO.getNome() != null && !disciplinaDTO.getNome().equals(disciplina.getNome())) {
+            Professor professor = disciplina.getProfessor();
+            validateUniqueDisciplina(disciplinaDTO.getNome(), professor, disciplina.getId());
+            disciplina.setNome(disciplinaDTO.getNome());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean updateProfessorDisciplina(Disciplina disciplina, DisciplinaDTO disciplinaDTO) {
+        if (disciplinaDTO.getProfessor() != null && (disciplina.getProfessor() == null || !disciplinaDTO.getProfessor().getId().equals(disciplina.getProfessor().getId()))) {
+            Professor professor = professorRepository.findById(disciplinaDTO.getProfessor().getId())
+                    .orElseThrow(() -> new IdNaoEncontradoException(disciplinaDTO.getProfessor().getId(), "Professor"));
+            validateUniqueDisciplina(disciplina.getNome(), professor, disciplina.getId());
+            disciplina.setProfessor(professor);
+            return true;
+        }
+        return false;
+    }
+
+    private void validateUniqueDisciplina(String nome, Professor professor, Long id) {
+        List<Disciplina> disciplinasEncontradas = disciplinaRepository.findByNomeAndProfessor(nome, professor);
+        for (Disciplina disciplina : disciplinasEncontradas) {
+            if (!disciplina.getId().equals(id)) {
+                throw new InformacaoDisciplinaDuplicadaException(disciplina.getId(), disciplina.getNome(), professor.getNome());
+            }
+        }
+    }
+
 
 
     public void delete(Long id) {
 
-        if (!repository.existsById(id)) {
+        if (!disciplinaRepository.existsById(id)) {
             throw new IdNaoEncontradoException(id, "Disciplina");
         }
-        repository.deleteById(id);
+        disciplinaRepository.deleteById(id);
 
     }
 
     public List<Disciplina> findByProfessorId(Long professorId){
-        return repository.findByProfessorId(professorId);
+        return disciplinaRepository.findByProfessorId(professorId);
 
 
 

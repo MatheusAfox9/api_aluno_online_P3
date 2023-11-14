@@ -8,6 +8,7 @@ public enum StatusMatricula {
     MATRICULADO("Matriculado"),
     TRANCADO("Trancado de Matrícula");
 
+
     private final String descricao;
 
     StatusMatricula(String descricao) {
