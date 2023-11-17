@@ -2,11 +2,14 @@ package com.alunoonline.api.services;
 
 import com.alunoonline.api.dto.PatchNotasRequest;
 import com.alunoonline.api.enums.StatusMatricula;
+import com.alunoonline.api.exception.IdNaoEncontradoException;
 import com.alunoonline.api.exception.InformacaoMatriculaDuplicadaException;
 import com.alunoonline.api.exception.ValidacaoMatriculaException;
 import com.alunoonline.api.model.Aluno;
 import com.alunoonline.api.model.Disciplina;
 import com.alunoonline.api.model.MatriculaAluno;
+import com.alunoonline.api.repository.AlunoRepository;
+import com.alunoonline.api.repository.DisciplinaRepository;
 import com.alunoonline.api.repository.MatriculaAlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +21,18 @@ import java.util.Optional;
 @Service
 public class MatriculaAlunoService {
 
+    private final MatriculaAlunoRepository repository;
+    private final AlunoRepository alunoRepository;
+    private final DisciplinaRepository disciplinaRepository;
+
     @Autowired
-    MatriculaAlunoRepository repository;
+    public MatriculaAlunoService(MatriculaAlunoRepository repository,
+                                 AlunoRepository alunoRepository,
+                                 DisciplinaRepository disciplinaRepository) {
+        this.repository = repository;
+        this.alunoRepository = alunoRepository;
+        this.disciplinaRepository = disciplinaRepository;
+    }
 
     public MatriculaAluno create(MatriculaAluno matriculaAluno) {
 
@@ -32,34 +45,31 @@ public class MatriculaAlunoService {
     }
 
     private void validateMatriculaAluno(MatriculaAluno matriculaAluno) {
-        List<String> missingFields = new ArrayList<>();
-
         if (matriculaAluno.getAluno() == null || matriculaAluno.getAluno().getId() == null) {
-            missingFields.add("aluno");
+            throw new ValidacaoMatriculaException("aluno");
         }
-        if (matriculaAluno.getDisciplina() == null || matriculaAluno.getDisciplina().getId() == null) {
-            missingFields.add("disciplina");
-        }
+        Aluno aluno = alunoRepository.findById(matriculaAluno.getAluno().getId())
+                .orElseThrow(() -> new IdNaoEncontradoException(matriculaAluno.getAluno().getId(), "Aluno"));
 
-        if (!missingFields.isEmpty()) {
-            throw new ValidacaoMatriculaException(String.join(", ", missingFields));
+        if (matriculaAluno.getDisciplina() == null || matriculaAluno.getDisciplina().getId() == null) {
+            throw new ValidacaoMatriculaException("disciplina");
         }
+        Disciplina disciplina = disciplinaRepository.findById(matriculaAluno.getDisciplina().getId())
+                .orElseThrow(() -> new IdNaoEncontradoException(matriculaAluno.getDisciplina().getId(), "Disciplina"));
+
+        matriculaAluno.setAluno(aluno);
+        matriculaAluno.setDisciplina(disciplina);
     }
+
 
     private void validateRegistrationDuplication(MatriculaAluno matriculaAluno) {
         boolean matriculaExists = repository.existsByAlunoAndDisciplina(
                 matriculaAluno.getAluno(), matriculaAluno.getDisciplina());
 
         if (matriculaExists) {
-            Aluno aluno = matriculaAluno.getAluno();
-            Disciplina disciplina = matriculaAluno.getDisciplina();
-            throw new InformacaoMatriculaDuplicadaException(aluno.getId(), aluno.getNome(), disciplina.getNome());
+            throw new InformacaoMatriculaDuplicadaException(matriculaAluno.getAluno().getId(), matriculaAluno.getAluno().getNome(), matriculaAluno.getDisciplina().getNome());
         }
     }
-
-
-
-
 
 
     public void updateStatus(Long id, StatusMatricula newStatus) {
